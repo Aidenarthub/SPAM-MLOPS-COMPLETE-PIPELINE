@@ -81,46 +81,34 @@ def preprocess_df(df,text_column='text',target_column='target'):
         logger.error('Error during text normalization: %s', e)
         raise
 
-def main(text_column='text',target_column='target'):
-    """
-    Main function to load raw data, preprocess it, and save the processed data.
-    """
+from pathlib import Path
+
+def main(text_column='text', target_column='target'):
     try:
-        # Fetch the data from data/raw
-        train_data=pd.read_csv('./data/raw/train.csv')
-        test_data=pd.read_csv('./data/raw/test.csv')
+        # Load raw data
+        train_data = pd.read_csv('./data/raw/train.csv')
+        test_data = pd.read_csv('./data/raw/test.csv')
         logger.debug('Data loaded properly')
 
-        # Transform the data
-        train_processed_data=preprocess_df(train_data,text_column,target_column)
-        test_processed_data=preprocess_df(test_data,text_column,target_column)
+        # Preprocess
+        train_processed_data = preprocess_df(train_data, text_column, target_column)
+        test_processed_data = preprocess_df(test_data, text_column, target_column)
 
-        # store the data inside data/processed
-        data_path=os.path.join('./data','interim')
-        os.makedirs(data_path,exist_ok=True)
+        # Save to data/interim
+        data_path = Path('./data') / 'interim'
+        data_path.mkdir(parents=True, exist_ok=True)
 
-        train_processed_data.to_csv(os.path.join(data_path,'train_processed.csv'),index=False)
-        test_processed_data.to_csv(os.path.join(data_path,'test_processed.csv'),index=False)
+        train_processed_data.to_csv(data_path / 'train_processed.csv', index=False)
+        test_processed_data.to_csv(data_path / 'test_processed.csv', index=False)
 
-        logger.debug('Processed data saved to %s',data_path)
+        logger.debug('Processed data saved to %s', data_path.as_posix())
     except FileNotFoundError as e:
-        logger.error('File not found: %s',e)
+        logger.error('File not found: %s', e)
     except pd.errors.EmptyDataError as e:
-        logger.error('No data: %s',e)
+        logger.error('No data: %s', e)
     except Exception as e:
-        logger.error('Failed to complete the data transformation process: %s',e)
+        logger.error('Failed to complete the data transformation process: %s', e)
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
